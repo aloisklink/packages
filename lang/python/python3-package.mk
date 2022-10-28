@@ -200,6 +200,14 @@ PYTHON3_PKG_HOST_PIP_INSTALL_ARGS = \
 		$(if $(findstring /,$(req)),$(req),$(python3_mk_path)host-pip-requirements/$(req).txt) \
 	)
 
+ifdef HOST_PYTHON3_PACKAGE_BUILD_DEPENDS
+	ifndef HOST_BUILD_DEPENDS
+		HOST_BUILD_DEPENDS := ""
+	endif
+	# python3-openssl is needed to download pip packages using https
+	HOST_BUILD_DEPENDS += python3-pip/host python3-openssl/host
+endif
+
 define Py3Build/FindStdlibDepends
 	$(SHELL) $(python3_mk_path)python3-find-stdlib-depends.sh -n "$(PKG_NAME)" "$(PKG_BUILD_DIR)";
 endef
