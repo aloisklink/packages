@@ -309,7 +309,13 @@ define Py3Package/python3/filespec
 endef
 
 HOST_LDFLAGS += \
-	-Wl$(comma)-rpath$(comma)$(STAGING_DIR_HOSTPKG)/lib
+	-Wl$(comma)-rpath$(comma)$(STAGING_DIR_HOSTPKG)/lib \
+	$$$$(pkg-config --static --libs libcrypto libssl)
+
+# statically link openssl on the host, so that we can use pip to download from https urls
+# https://github.com/python/cpython/commit/bacefbf41461ab703b8d561f0e3d766427eab367
+HOST_CONFIGURE_VARS += \
+	PY_UNSUPPORTED_OPENSSL_BUILD='static'
 
 ifeq ($(HOST_OS),Linux)
 HOST_LDFLAGS += \
@@ -331,6 +337,7 @@ HOST_CONFIGURE_ARGS+= \
 	--enable-optimizations \
 	--with-ensurepip=upgrade \
 	--with-system-expat=$(STAGING_DIR_HOST) \
+	--with-ssl \
 	--with-ssl-default-suites=openssl \
 	--without-cxx-main \
 	--without-pymalloc \
